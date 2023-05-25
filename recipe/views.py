@@ -1,13 +1,16 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
+from django.db.models import Q
 from .models import Category, Recipe
+from django.db.models import Count
 
-def gallery_view(request):
-    return render(request, 'gallery.html', {
+def category_list(request):
+    category_counts = Category.objects.annotate(recipe_count=Count('categories'))
+    return render(request, 'category_list.html', {
         'categories': Category.objects.all(),
+        'recipes': category_counts,
     })
 
-def image_detail(request, pk):
-    image = get_object_or_404(Recipe, pk=pk)
-    return render(request, 'image_detail.html', {
-        'image': image
+def main(request):
+    return render(request, 'main.html', {
+        'recipes': Recipe.objects.order_by('-id')[:5],
     })
